@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
-User = get_user_model
+User = get_user_model()
 
 # 게시글 - 제목, 내용, 작성자, 작성일, 수정일, 이미지, 조회수, 카테고리 기능
 class Post(models.Model):
@@ -9,7 +9,7 @@ class Post(models.Model):
 
     title = models.CharField(verbose_name='제목', null=False, max_length=60)
     content = models.TextField(verbose_name='내용', null=False, max_length=1000)
-    writer = models.ForeignKey(verbose_bame='작성자', to=User, on_delete=models.CASCADE, null=True, blank=True)
+    writer = models.ForeignKey(verbose_name='작성자', to=User, on_delete=models.CASCADE, null=True, blank=True)
     # 작성자가 삭제되면 게시글도 삭제됨
     created_at = models.DateTimeField(verbose_name='작성일', auto_now_add=True, null=False)
     modified_at = models.DateTimeField(verbose_name='마지막 수정일', auto_now=True, null=False)
