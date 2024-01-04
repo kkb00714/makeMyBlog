@@ -14,10 +14,17 @@ from rest_framework import generics
 # 1. 게시판 조회기능
 class BlogList(generics.ListAPIView):
 
-    def get(self, request):
-        blogs = Post.objects.all()
-        # blogs => Post 객체를 가져와 blogs에 할당
-        serializer = BlogBaseModel
+    queryset = Post.objects.all()
+        # queryset => Post 객체를 가져와 queryset에 할당
+    serializer_class = BlogBaseModel
+    # generics.ListAPIView가 기본적으로 get 메서드에서 
+    # queryset을 가져와 직렬화한 결괏값을 반환
+
+    # template_name = 'basehome.html'
+        
+        
+        
+        
 
         
         
