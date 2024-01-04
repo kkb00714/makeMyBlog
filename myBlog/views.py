@@ -15,13 +15,15 @@ from rest_framework import generics
 class BlogList(generics.ListAPIView):
 
     queryset = Post.objects.all()
-        # queryset => Post 객체를 가져와 queryset에 할당
+    # queryset => Post 객체를 가져와 queryset에 할당
+    
     serializer_class = BlogBaseModel
     # generics.ListAPIView가 기본적으로 get 메서드에서 
     # queryset을 가져와 직렬화한 결괏값을 반환
 
-    # template_name = 'basehome.html'
-        
+    template_name = 'blog_list.html'
+    
+
         
         
         
