@@ -120,6 +120,18 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+    # static 파일이 어떤 폴더에 들어가있는지에 대해 정의해줌
+    # 현재 Base_dir (MakeMyBlog) 이라는 폴더 안에 static 이라는 
+    # 폴더가 있다는 것을 정의함
+]
+
+# 사용자들이 업로드 하는 것
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+# media 파일이 존재할 경로를 지정해줌
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
@@ -136,4 +148,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
 #     'PAGE_SIZE': 10
 # }
+
 
