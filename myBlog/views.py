@@ -19,8 +19,8 @@ from rest_framework import status
 
 # 데이터를 처리
 
-# 1. 게시글 조회
-class BlogList(generics.ListAPIView):
+# 1. 게시글 조회 (게시글 상세)
+class PostDetail(generics.RetrieveAPIView):
 
     queryset = Post.objects.all()
     # queryset => Post 객체를 가져와 queryset에 할당
@@ -29,7 +29,7 @@ class BlogList(generics.ListAPIView):
     # generics.ListAPIView가 기본적으로 get 메서드에서 
     # queryset을 가져와 직렬화한 결괏값을 반환
 
-    template_name = 'blog_list.html'
+    template_name = 'blog_detail.html'
     
 # 2. 게시글 생성
 class PostCreate(generics.CreateAPIView):
@@ -53,7 +53,31 @@ class PostCreate(generics.CreateAPIView):
 
 
 # 3. 게시글 업데이트 기능
+class PostUpdate(generics.UpdateAPIView):
+    queryset = Post.objects.all()    
+    serializer_class = BlogBaseModel
+    # template_name = 'post_update.html'
+    
+    def patch(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        # 업데이트할 대상 객체인 instance에
+        # data = request.data (클라이언트로부터 받은 새로운 데이터) 를 담음
+        # partial = True 는 부분 업데이트를 허용한다는 옵션.
 
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        # 실제 업데이트를 수행
+        
+        return Response(serializer.data)
 
 # 4. 게시글 삭제 기능
-
+class PostDelete(generics.DestroyAPIView):
+    queryset = Post.objects.all()    
+    serializer_class = BlogBaseModel
+    
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
