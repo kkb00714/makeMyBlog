@@ -58,7 +58,7 @@ class PostUpdate(generics.UpdateAPIView):
     serializer_class = BlogBaseModel
     # template_name = 'post_update.html'
     
-    def patch(self, request, *args, **kwargs):
+    def update(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         # 업데이트할 대상 객체인 instance에

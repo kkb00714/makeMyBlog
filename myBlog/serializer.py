@@ -2,7 +2,7 @@ from .models import Post, Comment
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
-# 기본 설정
+# 게시판 기본 설정
 class BlogBaseModel(serializers.ModelSerializer):
     class Meta:
         model = Post
@@ -14,21 +14,23 @@ class BlogBaseModel(serializers.ModelSerializer):
 # 게시글 작성
 class PostCreateModel(BlogBaseModel):
     class Meta(BlogBaseModel.Meta):
-        exclude = ['modified_at', 'view_counter',]
+        fields = [
+            'title', 
+            'content',
+            'image',
+            ]
 
 # 게시글 상세보기
 class PostDetailModel(BlogBaseModel):
     class Meta(BlogBaseModel.Meta):
 
-        fields = [
-            'title', 
-            'content',
-            'writer',
-            'created_at', 
-            'modified_at',
-            'image',
-            'view_count', 
-            ]
+        fields = '__all__'
+        extra_fields = ['comments']
+        
+    def get_comments(self, instance):
+        comments = Comment.objects.filter(post=instance)
+        serializer = BaseCommentModel(comments, many=True)
+        return serializer.data
 
 # 게시글 업데이트
 class PostUpdateModel(BlogBaseModel):
@@ -40,3 +42,24 @@ class PostDeleteModel(BlogBaseModel):
     class Meta(BlogBaseModel.Meta):
         pass
 
+
+# 댓글 기본 설정
+class BaseCommentModel(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = '__all__'
+        
+# 댓글 생성
+class CommentCreateModel(BaseCommentModel):
+    class Meta(BaseCommentModel.Meta):
+        fields = ['content', 'post']
+
+# 댓글 업데이트
+class CommentUpdateModel(BaseCommentModel):
+    class Meta(BaseCommentModel.Meta):
+        fields = ['content']
+
+# 댓글 삭제
+class CommentDeleteModel(BaseCommentModel):
+    class Meta(BaseCommentModel.Meta):
+        pass
