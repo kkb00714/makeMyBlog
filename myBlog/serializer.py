@@ -2,6 +2,12 @@ from .models import Post, Comment
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
+# 댓글 기본 설정
+class BaseCommentModel(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = '__all__'
+
 # 게시판 기본 설정
 class BlogBaseModel(serializers.ModelSerializer):
     class Meta:
@@ -22,10 +28,10 @@ class PostCreateModel(BlogBaseModel):
 
 # 게시글 상세보기
 class PostDetailModel(BlogBaseModel):
+    comments = serializers.SerializerMethodField()
+    
     class Meta(BlogBaseModel.Meta):
-
         fields = '__all__'
-        extra_fields = ['comments']
         
     def get_comments(self, instance):
         comments = Comment.objects.filter(post=instance)
@@ -41,13 +47,6 @@ class PostUpdateModel(BlogBaseModel):
 class PostDeleteModel(BlogBaseModel):
     class Meta(BlogBaseModel.Meta):
         pass
-
-
-# 댓글 기본 설정
-class BaseCommentModel(serializers.ModelSerializer):
-    class Meta:
-        model = Comment
-        fields = '__all__'
         
 # 댓글 생성
 class CommentCreateModel(BaseCommentModel):
@@ -63,3 +62,5 @@ class CommentUpdateModel(BaseCommentModel):
 class CommentDeleteModel(BaseCommentModel):
     class Meta(BaseCommentModel.Meta):
         pass
+    
+
