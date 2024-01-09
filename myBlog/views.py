@@ -1,17 +1,15 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import Http404
-
 
 from django.contrib.auth.models import User
 from .models import Post, Comment
 from .serializer import (
-                        BlogBaseModel,
                         PostCreateModel,
                         PostUpdateModel,
                         CommentCreateModel,
+                        CommentDeleteModel,
                         )
 
-from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework import status
@@ -54,8 +52,27 @@ class PostDetail(generics.RetrieveUpdateDestroyAPIView):
     
     
 
-# 5. 댓글 작성(생성) 기능
+# 3. 댓글 작성(생성) 기능
 class CommentCreate(generics.CreateAPIView):
     serializer_class = CommentCreateModel
     
-# 
+    def perform_create(self, serializer):
+        # URL에서 게시글 ID  추출
+        post_id = self.kwargs.get(['post_id'])
+        # 댓글을 생성할 때 게시글 정보를 저장
+        serializer.save(post_id = post_id)
+    
+# 4. 댓글 삭제 기능
+class CommentDelete(generics.DestroyAPIView):
+    queryset = Comment.objects.all()
+
+    def destroy(self, request, *args, **kwargs):
+        # URL에서 댓글 ID 추출
+        comment_id = self.kwargs.get('comment_id')
+
+        # 댓글 삭제
+        Comment.objects.filter(pk=comment_id).delete()
+
+        # 댓글 삭제 후 게시글 화면으로 리다이렉션
+        post_id = self.kwargs.get('post_id')
+        return redirect(f'/main/detail/{post_id}/')

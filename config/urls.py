@@ -4,6 +4,7 @@ from django.urls import path
 from myBlog.views import (PostDetail, 
                         PostList,
                         CommentCreate,
+                        CommentDelete,
                         )
 
 urlpatterns = [
@@ -11,7 +12,8 @@ urlpatterns = [
     
     # 게시글 url
     path('main/', PostList.as_view(), name='post-list'),
-    path('main/detail/<int:pk>/', PostDetail.as_view(), name='post-detail'),
+    path('main/<int:pk>/', PostDetail.as_view(), name='post-detail'),
     
-    path('comments/', CommentCreate.as_view(), name='comment'),
+    path('main/<int:post_id>/comment', CommentCreate.as_view(), name='comment-create'),
+    path('main/<int:post_id>/comment/<int:comment_id>', CommentDelete.as_view(), name='comment-delete'),
 ]
