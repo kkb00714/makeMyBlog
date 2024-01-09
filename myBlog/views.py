@@ -1,43 +1,28 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import Http404
+
 
 from django.contrib.auth.models import User
 from .models import Post, Comment
 from .serializer import (
                         BlogBaseModel,
                         PostCreateModel,
-                        PostDetailModel,
                         PostUpdateModel,
-                        PostDeleteModel,
+                        CommentCreateModel,
                         )
 
-from rest_framework.views import APIView
+from rest_framework import viewsets
 from rest_framework.response import Response
-from rest_framework import authentication, permissions
 from rest_framework import generics
 from rest_framework import status
 
 # 데이터를 처리
 
-# 1. 게시글 조회 (게시글 상세)
-class PostDetail(generics.RetrieveAPIView):
-
+# 1. 게시글 목록 + 생성
+class PostList(generics.ListCreateAPIView):
     queryset = Post.objects.all()
-    # queryset => Post 객체를 가져와 queryset에 할당
+    serializer_class = PostCreateModel
     
-    serializer_class = BlogBaseModel
-    # generics.ListAPIView가 기본적으로 get 메서드에서 
-    # queryset을 가져와 직렬화한 결괏값을 반환
-
-    template_name = 'blog_detail.html'
-    
-# 2. 게시글 생성
-class PostCreate(generics.CreateAPIView):
-    
-    queryset = Post.objects.all()    
-    serializer_class = BlogBaseModel
-    # template_name = 'post_create.html'
-
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         # request로부터 받은 데이터를 기반으로 직렬화된 데이터 생성
@@ -51,33 +36,26 @@ class PostCreate(generics.CreateAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
         # 성공 응답 반환
 
-
-# 3. 게시글 업데이트 기능
-class PostUpdate(generics.UpdateAPIView):
-    queryset = Post.objects.all()    
-    serializer_class = BlogBaseModel
-    # template_name = 'post_update.html'
+# 2. 게시글 상세, 수정, 삭제
+class PostDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Post.objects.all()
+    # queryset => Post 객체를 가져와 queryset에 할당
+    serializer_class = PostUpdateModel
     
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
     def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
-        # 업데이트할 대상 객체인 instance에
-        # data = request.data (클라이언트로부터 받은 새로운 데이터) 를 담음
-        # partial = True 는 부분 업데이트를 허용한다는 옵션.
+        return super().update(request, *args, **kwargs)
 
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
-        # 실제 업데이트를 수행
-        
-        return Response(serializer.data)
-
-# 4. 게시글 삭제 기능
-class PostDelete(generics.DestroyAPIView):
-    queryset = Post.objects.all()    
-    serializer_class = BlogBaseModel
-    
     def delete(self, request, *args, **kwargs):
-        instance = self.get_object()
-        self.perform_destroy(instance)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return self.destroy(request, *args, **kwargs)
     
+    
+    
+
+# 5. 댓글 작성(생성) 기능
+class CommentCreate(generics.CreateAPIView):
+    serializer_class = CommentCreateModel
+    
+# 

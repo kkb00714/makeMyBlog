@@ -6,13 +6,26 @@ from rest_framework.serializers import ModelSerializer
 class BaseCommentModel(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = '__all__'
+        fields = [
+            'post',
+            'writer',
+            'content',
+            'created_at',
+        ]
 
 # 게시판 기본 설정
 class BlogBaseModel(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = '__all__'
+        fields = [            
+            'title', 
+            'writer',
+            'image',
+            'content',
+            'created_at',
+            'modified_at',
+            'view_count',
+            ]
         
         # exclude = ['field_to_exclude']
         # 나중에 제외하고 싶은 필드 추가할 때 사용
@@ -22,8 +35,11 @@ class PostCreateModel(BlogBaseModel):
     class Meta(BlogBaseModel.Meta):
         fields = [
             'title', 
-            'content',
+            'writer',
             'image',
+            'content',
+            'created_at',
+            'modified_at',
             ]
 
 # 게시글 상세보기
@@ -31,7 +47,17 @@ class PostDetailModel(BlogBaseModel):
     comments = serializers.SerializerMethodField()
     
     class Meta(BlogBaseModel.Meta):
-        fields = '__all__'
+        fields = [
+                'id', 
+                'title', 
+                'writer', 
+                'image', 
+                'content', 
+                'created_at', 
+                'modified_at', 
+                'view_count', 
+                'comments',
+                ]
         
     def get_comments(self, instance):
         comments = Comment.objects.filter(post=instance)
@@ -41,17 +67,27 @@ class PostDetailModel(BlogBaseModel):
 # 게시글 업데이트
 class PostUpdateModel(BlogBaseModel):
     class Meta(BlogBaseModel.Meta):
-        fields = ['title', 'content', 'image',]
+        fields = [
+            'title', 
+            'content', 
+            'image',
+            ]
 
 # 게시글 삭제
 class PostDeleteModel(BlogBaseModel):
     class Meta(BlogBaseModel.Meta):
         pass
+    
         
 # 댓글 생성
 class CommentCreateModel(BaseCommentModel):
     class Meta(BaseCommentModel.Meta):
-        fields = ['content', 'post']
+        fields = [
+            'writer', 
+            'content', 
+            'post', 
+            'created_at'
+            ]
 
 # 댓글 업데이트
 class CommentUpdateModel(BaseCommentModel):
