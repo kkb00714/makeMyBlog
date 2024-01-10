@@ -1,13 +1,16 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import Http404
+from django.http import Http404, JsonResponse
 
 from django.contrib.auth.models import User
 from .models import Post, Comment
 from .serializer import (
+                        BlogBaseModel,
                         PostCreateModel,
+                        PostDetailModel,
                         PostUpdateModel,
                         CommentCreateModel,
                         CommentDeleteModel,
+                        BaseCommentModel,
                         )
 
 from rest_framework.response import Response
@@ -38,7 +41,7 @@ class PostList(generics.ListCreateAPIView):
 class PostDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()
     # queryset => Post 객체를 가져와 queryset에 할당
-    serializer_class = PostUpdateModel
+    serializer_class = PostDetailModel
     
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
@@ -49,22 +52,22 @@ class PostDetail(generics.RetrieveUpdateDestroyAPIView):
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
     
-    
-    
 
 # 3. 댓글 작성(생성) 기능
 class CommentCreate(generics.CreateAPIView):
-    serializer_class = CommentCreateModel
-    
+    serializer_class = BaseCommentModel
+
     def perform_create(self, serializer):
-        # URL에서 게시글 ID  추출
-        post_id = self.kwargs.get(['post_id'])
-        # 댓글을 생성할 때 게시글 정보를 저장
-        serializer.save(post_id = post_id)
-    
+        serializer.save()
+        
+        post_serializer = PostCreateModel(serializer.instance.post)
+        post_data = post_serializer.data
+        return JsonResponse(post_data, safe=False)
+
 # 4. 댓글 삭제 기능
 class CommentDelete(generics.DestroyAPIView):
     queryset = Comment.objects.all()
+    serializer_class = CommentDeleteModel
 
     def destroy(self, request, *args, **kwargs):
         # URL에서 댓글 ID 추출

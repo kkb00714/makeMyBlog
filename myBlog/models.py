@@ -6,7 +6,6 @@ User = get_user_model()
 # 게시글 - 제목, 내용, 작성자, 작성일, 수정일, 이미지, 조회수, 카테고리 기능
 class Post(models.Model):
     # 추가해야 할 것 : 카테고리 기능
-
     title = models.CharField(verbose_name='제목', null=False, max_length=60)
     content = models.TextField(verbose_name='내용', null=False, max_length=1000)
     writer = models.ForeignKey(verbose_name='작성자', to=User, on_delete=models.CASCADE, null=True, blank=True)
