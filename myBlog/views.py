@@ -68,14 +68,17 @@ class CommentCreate(generics.CreateAPIView):
 class CommentDelete(generics.DestroyAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentDeleteModel
+    lookup_url_kwarg = 'comment_id'
 
     def destroy(self, request, *args, **kwargs):
         # URL에서 댓글 ID 추출
         comment_id = self.kwargs.get('comment_id')
 
-        # 댓글 삭제
-        Comment.objects.filter(pk=comment_id).delete()
-
+        
+        comment_instance = self.get_object()        
         # 댓글 삭제 후 게시글 화면으로 리다이렉션
-        post_id = self.kwargs.get('post_id')
-        return redirect(f'/main/detail/{post_id}/')
+        
+        post_id = comment_instance.post.id
+        comment_instance.delete()
+    
+        return Response(status=status.HTTP_200_OK)

@@ -28,6 +28,7 @@ class BaseCommentModel(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = [
+            'pk',
             'post',
             'writer',
             'content',
@@ -46,6 +47,7 @@ class BaseCommentModel(serializers.ModelSerializer):
 class PostCreateModel(BlogBaseModel):
     class Meta(BlogBaseModel.Meta):
         fields = [
+            'pk',
             'title', 
             'writer',
             'image',
@@ -62,7 +64,7 @@ class PostDetailModel(BlogBaseModel):
         comments = Comment.objects.filter(post=instance)
         serializer = BaseCommentModel(comments, many=True)
         return serializer.data
-        
+
     class Meta(BlogBaseModel.Meta):
         fields = [
                 'pk',
@@ -96,6 +98,7 @@ class PostDeleteModel(BlogBaseModel):
 class CommentCreateModel(BaseCommentModel):
     class Meta(BaseCommentModel.Meta):
         fields = [
+            'pk',
             'writer', 
             'content',
             'created_at'
@@ -110,5 +113,8 @@ class CommentCreateModel(BaseCommentModel):
 class CommentDeleteModel(BaseCommentModel):
     class Meta(BaseCommentModel.Meta):
         pass
+    
+    def destroy(self, instance):
+        instance.delete()
     
 
